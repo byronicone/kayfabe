@@ -1,5 +1,4 @@
 # kayfabe
-Tells you who is a better wrestler in kayfabe by scraping for match results and analyzing them!  
 
 ### .env file (required)  
 * replace the stars with values from your twitter account  

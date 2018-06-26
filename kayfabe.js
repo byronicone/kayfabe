@@ -64,10 +64,7 @@ kayfabe.getTweets = async function getTweets(q, count) {
 function getTextNoDupes(uniqueTweets, oneTweet) {
     let txt = oneTweet.retweeted_status ? oneTweet.retweeted_status.full_text : oneTweet.full_text;
     txt = txt.split(/ |\n/).filter(v => !v.startsWith('http')).join(' ');
-    if(oneTweet.user.screen_name == 'WWE'){
-      // console.log('filtering out WWE tweet');
-    }
-    else{
+    if(oneTweet.user.screen_name != 'WWE'){
       uniqueTweets.add(txt);
     }
     return uniqueTweets;

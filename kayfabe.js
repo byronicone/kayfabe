@@ -4,6 +4,7 @@ const Sentiment = require('sentiment');
 const dotenv = require('dotenv');
 const colors = require('colors/safe');
 const Twit = require('twit');
+const R = require('ramda');
 
 dotenv.config();
 
@@ -46,29 +47,30 @@ async function getWrestlerSentiments(wrestlers) {
 }
 
 kayfabe.getPageOfTweets = async function getPageOfTweets(q, count){
-    return await api.get('search/tweets', {q, count, tweet_mode: 'extended'});
+    try{
+      let tweets = await api.get('search/tweets', {q, count, tweet_mode: 'extended', include_entities: false});
+      return tweets.data.statuses.reduce((uniqueTweets, oneTweet) => {
+        if(oneTweet.retweeted_status == null){
+          uniqueTweets.push(R.pick(['full_text'], oneTweet));
+        }
+        return uniqueTweets;
+      }, []);
+    }
+    catch(e){
+      console.log('Could not get page of tweets');
+      return e;
+    }
 }
 
 kayfabe.getTweets = async function getTweets(q, count) {
     try{
-      let knownTexts = new Set();
       let tweets = await kayfabe.getPageOFTweets(q, count);
-      return tweets.data.statuses.reduce((uniqueTweets, tweet) => getTextNoDupes(uniqueTweets, tweet), new Set());
     }
     catch(err){
       console.log(`This query triggered an error:  ${q}`);
       console.log(err);
     }
 }
-
-function getTextNoDupes(uniqueTweets, oneTweet) {
-    let txt = oneTweet.retweeted_status ? oneTweet.retweeted_status.full_text : oneTweet.full_text;
-    txt = txt.split(/ |\n/).filter(v => !v.startsWith('http')).join(' ');
-    if(oneTweet.user.screen_name != 'WWE'){
-      uniqueTweets.add(txt);
-    }
-    return uniqueTweets;
- }
 
 String.prototype.color = function(sentiment){
   if(sentiment > 5){

@@ -1,4 +1,5 @@
 # kayfabe
+I'm just using this project to test the github API right now
 
 ### .env file (required)  
 * replace the stars with values from your twitter account  
